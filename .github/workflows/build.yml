@@ -1,0 +1,41 @@
+name: Build & Analyze
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: Build and Analyze
+    runs-on: macos-latest # Flutter works best on macOS for iOS builds, but you can use ubuntu-latest if Android only
+
+    steps:
+      # 1. Checkout repo
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # required for better analysis
+
+      # 2. Setup Flutter
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.3" # or your required Flutter version
+
+      # 3. Install dependencies
+      - run: flutter pub get
+
+      # 4. Run tests + generate coverage
+      - run: flutter test --coverage
+
+      # 5. Run SonarQube scan
+      - uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      # 6. (Optional) Enforce quality gate
+      # - uses: SonarSource/sonarqube-quality-gate-action@v1
+      #   timeout-minutes: 5
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

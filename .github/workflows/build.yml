@@ -5,11 +5,13 @@ on:
     branches:
       - master
   pull_request:
+    branches:
+      - master
 
 jobs:
   build:
     name: Build and Analyze
-    runs-on: macos-latest # Flutter works best on macOS for iOS builds, but you can use ubuntu-latest if Android only
+    runs-on: macos-latest # Use ubuntu-latest if only Android is needed
 
     steps:
       # 1. Checkout repo
@@ -28,14 +30,14 @@ jobs:
       # 4. Run tests + generate coverage
       - run: flutter test --coverage
 
-      # 5. Run SonarQube scan
+      # 5. Run SonarQube/SonarCloud scan
       - uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      # 6. (Optional) Enforce quality gate
-      # - uses: SonarSource/sonarqube-quality-gate-action@v1
-      #   timeout-minutes: 5
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # 6. Enforce quality gate (❌ fail build if gate = red)
+      - uses: SonarSource/sonarqube-quality-gate-action@v1
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

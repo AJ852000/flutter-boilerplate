@@ -14,6 +14,5 @@ final class FlowTestLoaded extends FlowTestState {
 
 final class FlowTestError extends FlowTestState {
   final String message;
-  final String message2;
-  FlowTestError(this.message, this.message2);
+  FlowTestError(this.message);
 }

@@ -22,10 +22,10 @@ class FlowTestBloc extends Bloc<FlowTestEvent, FlowTestState> {
         final model = FlowTestModel.fromJson(response.data);
         emit(FlowTestLoaded(model));
       } else {
-        emit(FlowTestError('No data received', "test"));
+        emit(FlowTestError('No data received'));
       }
     } catch (e) {
-      emit(FlowTestError(e.toString(), "test"));
+      emit(FlowTestError(e.toString()));
     }
   }
 }

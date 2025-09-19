@@ -10,24 +10,23 @@ on:
 
 jobs:
   build:
-    name: Build and Analyze
-    runs-on: macos-latest # Use ubuntu-latest if only Android is needed
+    runs-on: macos-latest # ubuntu-latest works too for Android-only projects
 
     steps:
       # 1. Checkout repo
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # required for better analysis
+          fetch-depth: 0
 
       # 2. Setup Flutter
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.22.3" # or your required Flutter version
+          flutter-version: "3.22.3"
 
       # 3. Install dependencies
       - run: flutter pub get
 
-      # 4. Run analyzer (save output to file)
+      # 4. Run analyzer (save output)
       - run: flutter analyze > flutter_analyze.txt || true
 
       # 5. Install Reviewdog
@@ -35,8 +34,8 @@ jobs:
         with:
           reviewdog_version: latest
 
-      # 6. Report analyzer issues with Reviewdog
-      - name: Run reviewdog on flutter analyze
+      # 6. Report analyzer issues (reviewdog)
+      - name: Reviewdog on flutter analyze
         run: |
           cat flutter_analyze.txt | reviewdog \
             -efm="%f:%l:%c • %m" \
@@ -46,17 +45,33 @@ jobs:
             -fail-level=error
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # 7. Run tests + generate coverage
+
+      # 7. Run tests + coverage
       - run: flutter test --coverage
 
-      # 8. Run SonarQube/SonarCloud scan
-      - uses: SonarSource/sonarqube-scan-action@v5
+      # 8. Run SonarQube scanner (JSON output for reviewdog)
+      - name: Run SonarQube Scan
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=flutter-boilerplate \
+            -Dsonar.sources=lib \
+            -Dsonar.tests=test \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.coverageReportPaths=coverage/lcov.info \
+            -Dsonar.qualitygate.wait=true \
+            -Dsonar.report.export.path=sonar-report.json
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      # 9. Enforce quality gate (❌ fail build if gate = red)
-      - uses: SonarSource/sonarqube-quality-gate-action@v1
-        timeout-minutes: 5
+      # 9. Reviewdog → GitHub PR Comments from SonarQube
+      - name: Reviewdog SonarQube Report
+        run: |
+          cat sonar-report.json | reviewdog \
+            -f=rdjson \
+            -name="sonarqube" \
+            -reporter=github-pr-review \
+            -fail-level=error
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}

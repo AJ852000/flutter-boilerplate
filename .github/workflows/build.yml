@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest # ubuntu-latest works too for Android-only projects
+    runs-on: macos-latest # or ubuntu-latest if you don't need iOS
 
     steps:
       # 1. Checkout repo
@@ -49,17 +49,18 @@ jobs:
       # 7. Run tests + coverage
       - run: flutter test --coverage
 
-      # 8. Run SonarQube scanner (JSON output for reviewdog)
-      - name: Run SonarQube Scan
-        run: |
-          sonar-scanner \
-            -Dsonar.projectKey=flutter-boilerplate \
-            -Dsonar.sources=lib \
-            -Dsonar.tests=test \
-            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.coverageReportPaths=coverage/lcov.info \
-            -Dsonar.qualitygate.wait=true \
+      # 8. Run SonarQube Scan (with official action)
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          args: >
+            -Dsonar.projectKey=flutter-boilerplate
+            -Dsonar.sources=lib
+            -Dsonar.tests=test
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.coverageReportPaths=coverage/lcov.info
+            -Dsonar.qualitygate.wait=true
             -Dsonar.report.export.path=sonar-report.json
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

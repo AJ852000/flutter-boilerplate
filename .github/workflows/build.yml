@@ -30,17 +30,16 @@ jobs:
       # 4. Run analyzer (static checks)
       - run: flutter analyze > flutter_analyze.txt
 
-      # 5. Run Reviewdog on analyzer output
-      - uses: reviewdog/action-setup@v1
-
-      - name: Report Flutter Analyzer Issues
-        uses: reviewdog/action-linter@v1
+      # 5. Report analyzer results with Reviewdog
+      - name: Run reviewdog on flutter analyze
+        uses: reviewdog/action-reviewdog@v1
         with:
           name: flutter-analyze
-          reporter: github-pr-review # or github-pr-check for check tab only
+          reporter: github-pr-review # or github-pr-check
           filter_mode: file
           fail_on_error: true
-          input: flutter_analyze.txt
+          input_file: flutter_analyze.txt
+          tool_name: flutter-analyze
 
       # 6. Run tests + generate coverage
       - run: flutter test --coverage

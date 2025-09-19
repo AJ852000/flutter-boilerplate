@@ -27,16 +27,31 @@ jobs:
       # 3. Install dependencies
       - run: flutter pub get
 
-      # 4. Run tests + generate coverage
+      # 4. Run analyzer (static checks)
+      - run: flutter analyze > flutter_analyze.txt
+
+      # 5. Run Reviewdog on analyzer output
+      - uses: reviewdog/action-setup@v1
+
+      - name: Report Flutter Analyzer Issues
+        uses: reviewdog/action-linter@v1
+        with:
+          name: flutter-analyze
+          reporter: github-pr-review # or github-pr-check for check tab only
+          filter_mode: file
+          fail_on_error: true
+          input: flutter_analyze.txt
+
+      # 6. Run tests + generate coverage
       - run: flutter test --coverage
 
-      # 5. Run SonarQube/SonarCloud scan
+      # 7. Run SonarQube/SonarCloud scan
       - uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      # 6. Enforce quality gate (❌ fail build if gate = red)
+      # 8. Enforce quality gate (❌ fail build if gate = red)
       - uses: SonarSource/sonarqube-quality-gate-action@v1
         timeout-minutes: 5
         env:

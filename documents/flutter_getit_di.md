@@ -59,7 +59,7 @@ dependencies:
 
 ## 🔹 4. Setup Service Locator
 
-📄 `lib/service_locator.dart`
+📄 [serviceLocator.dart](lib/core/serviceLocator.dart)
 
 ```dart
 import 'package:get_it/get_it.dart';
@@ -84,7 +84,7 @@ void setupLocator({bool isTest = false}) {
 
 ## 🔹 5. Repositories
 
-📄 `lib/repositories/auth_repository.dart`
+📄 [auth_repository.dart](lib/features/auth/repositories/auth_repository.dart)
 
 ```dart
 class AuthRepository {
@@ -96,7 +96,7 @@ class AuthRepository {
 }
 ```
 
-📄 `lib/repositories/mock_auth_repository.dart`
+📄 [mock_auth_repository.dart](lib/features/auth/repositories/mock_auth_repository.dart)
 
 ```dart
 import 'auth_repository.dart';
@@ -113,7 +113,7 @@ class MockAuthRepository extends AuthRepository {
 
 ## 🔹 6. Bloc Layer
 
-📄 `lib/features/auth/bloc/auth_event.dart`
+📄 [auth_event.dart](lib/features/auth/bloc/auth_event.dart)
 
 ```dart
 abstract class AuthEvent {}
@@ -126,7 +126,7 @@ class LoginRequested extends AuthEvent {
 }
 ```
 
-📄 `lib/features/auth/bloc/auth_state.dart`
+📄 '[auth_state.dart](lib/features/auth/bloc/auth_state.dart)'
 
 ```dart
 abstract class AuthState {}
@@ -143,7 +143,7 @@ class AuthFailure extends AuthState {
 }
 ```
 
-📄 `lib/features/auth/bloc/auth_bloc.dart`
+📄 [auth_bloc.dart](lib/features/auth/bloc/auth_bloc.dart)
 
 ```dart
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -173,14 +173,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
 ## 🔹 7. UI Layer
 
-📄 `lib/features/auth/view/login_page.dart`
+📄 `login_page.dart`(lib/features/auth/view/login_page.dart)
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/auth_bloc.dart';
-import '../bloc/auth_event.dart';
-import '../bloc/auth_state.dart';
+import 'package:new_boilerplate/features/auth/bloc/auth_bloc.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -192,39 +190,41 @@ class LoginPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Login")),
-      body: BlocProvider(
-        create: (_) => AuthBloc(),
-        child: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is AuthSuccess) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.message)));
-            }
-          },
-          builder: (context, state) {
-            if (state is AuthLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthSuccess) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(state.message)));
+          }
+        },
+        builder: (context, state) {
+          if (state is AuthLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  TextField(controller: userCtrl, decoration: const InputDecoration(labelText: "Username")),
-                  TextField(controller: passCtrl, decoration: const InputDecoration(labelText: "Password")),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<AuthBloc>().add(
-                          LoginRequested(userCtrl.text, passCtrl.text));
-                    },
-                    child: const Text("Login"),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                TextField(
+                    controller: userCtrl,
+                    decoration: const InputDecoration(labelText: "Username")),
+                TextField(
+                    controller: passCtrl,
+                    decoration: const InputDecoration(labelText: "Password")),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<AuthBloc>()
+                        .add(LoginRequested(userCtrl.text, passCtrl.text));
+                  },
+                  child: const Text("Login"),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

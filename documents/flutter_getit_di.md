@@ -1,13 +1,13 @@
-
 # 🚀 Dependency Injection in Flutter using GetIt (with Integration Testing)
 
-This guide explains **Dependency Injection (DI)** in Flutter using **GetIt**, shows how to structure dependencies, and how to **swap repositories** (Production vs Test) for integration testing.  
+This guide explains **Dependency Injection (DI)** in Flutter using **GetIt**, shows how to structure dependencies, and how to **swap repositories** (Production vs Test) for integration testing.
 
 ---
 
 ## 🔹 1. What is Dependency Injection (DI)?
 
 ### ❌ Without DI (tight coupling)
+
 ```dart
 class UserBloc {
   final UserRepository repo = UserRepository(); // tightly coupled
@@ -15,10 +15,12 @@ class UserBloc {
 ```
 
 Problems:
+
 - Cannot easily replace `UserRepository` with a **mock** in tests.
 - Hard to maintain in large projects.
 
 ### ✅ With DI (loose coupling)
+
 ```dart
 class UserBloc {
   final UserRepository repo;
@@ -27,6 +29,7 @@ class UserBloc {
 ```
 
 Benefits:
+
 - Testability (swap real vs fake repos).
 - Clear separation of concerns.
 - Better scalability.
@@ -36,8 +39,9 @@ Benefits:
 ## 🔹 2. Why Use GetIt?
 
 [`get_it`](https://pub.dev/packages/get_it) is a **service locator** that:
+
 - Registers services, repositories, and blocs once.
-- Resolves them anywhere in the app (`getIt<T>()`).
+- Resolves them anywhere in the app (`sl<T>()`).
 - Allows swapping implementations for **different environments** (prod vs test).
 
 ---
@@ -45,6 +49,7 @@ Benefits:
 ## 🔹 3. Install GetIt
 
 In `pubspec.yaml`:
+
 ```yaml
 dependencies:
   get_it: ^7.6.0
@@ -55,22 +60,22 @@ dependencies:
 ## 🔹 4. Setup Service Locator
 
 📄 `lib/service_locator.dart`
+
 ```dart
 import 'package:get_it/get_it.dart';
 import 'repositories/auth_repository.dart';
 import 'repositories/mock_auth_repository.dart';
 
-final getIt = GetIt.instance;
+final sl = GetIt.instance;
 
 void setupLocator({bool isTest = false}) {
-  getIt.reset(); // clear previous registrations
 
   if (isTest) {
     // Register fake repo for testing
-    getIt.registerLazySingleton<AuthRepository>(() => MockAuthRepository());
+    sl.registerLazySingleton<AuthRepository>(() => MockAuthRepository());
   } else {
     // Register real repo for production
-    getIt.registerLazySingleton<AuthRepository>(() => AuthRepository());
+    sl.registerLazySingleton<AuthRepository>(() => AuthRepository());
   }
 }
 ```
@@ -80,6 +85,7 @@ void setupLocator({bool isTest = false}) {
 ## 🔹 5. Repositories
 
 📄 `lib/repositories/auth_repository.dart`
+
 ```dart
 class AuthRepository {
   Future<String> login(String username, String password) async {
@@ -91,6 +97,7 @@ class AuthRepository {
 ```
 
 📄 `lib/repositories/mock_auth_repository.dart`
+
 ```dart
 import 'auth_repository.dart';
 
@@ -107,6 +114,7 @@ class MockAuthRepository extends AuthRepository {
 ## 🔹 6. Bloc Layer
 
 📄 `lib/features/auth/bloc/auth_event.dart`
+
 ```dart
 abstract class AuthEvent {}
 
@@ -119,6 +127,7 @@ class LoginRequested extends AuthEvent {
 ```
 
 📄 `lib/features/auth/bloc/auth_state.dart`
+
 ```dart
 abstract class AuthState {}
 
@@ -135,6 +144,7 @@ class AuthFailure extends AuthState {
 ```
 
 📄 `lib/features/auth/bloc/auth_bloc.dart`
+
 ```dart
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../repositories/auth_repository.dart';
@@ -143,7 +153,7 @@ import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final AuthRepository repo = getIt<AuthRepository>();
+  final AuthRepository repo = sl<AuthRepository>();
 
   AuthBloc() : super(AuthInitial()) {
     on<LoginRequested>((event, emit) async {
@@ -164,6 +174,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 ## 🔹 7. UI Layer
 
 📄 `lib/features/auth/view/login_page.dart`
+
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -225,6 +236,7 @@ class LoginPage extends StatelessWidget {
 ## 🔹 8. Main Entry
 
 📄 `lib/main.dart`
+
 ```dart
 import 'package:flutter/material.dart';
 import 'service_locator.dart';
@@ -254,6 +266,7 @@ class MyApp extends StatelessWidget {
 ## 🔹 9. Integration Test with Mock Repository
 
 📄 `integration_test/app_test.dart`
+
 ```dart
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -288,19 +301,20 @@ void main() {
 
 ## 🔹 10. How DI + GetIt Helps Here
 
-| Scenario             | Repository Used         |
-|----------------------|-------------------------|
-| Production run       | `AuthRepository` (real) |
-| Integration testing  | `MockAuthRepository`    |
+| Scenario            | Repository Used         |
+| ------------------- | ----------------------- |
+| Production run      | `AuthRepository` (real) |
+| Integration testing | `MockAuthRepository`    |
 
-- **Same Bloc/UI code** works without change.  
-- Only `service_locator.dart` decides which dependency to inject.  
+- **Same Bloc/UI code** works without change.
+- Only `service_locator.dart` decides which dependency to inject.
 - Easy to maintain, test, and scale.
 
 ---
 
 ## ✅ Summary
-- **GetIt** provides a clean way to manage dependencies.  
-- Use `setupLocator(isTest: true)` to **inject test repositories**.  
-- Works seamlessly with **Bloc, Cubit, Provider, or Riverpod**.  
-- Great for **integration tests** where you need to mock APIs.  
+
+- **GetIt** provides a clean way to manage dependencies.
+- Use `setupLocator(isTest: true)` to **inject test repositories**.
+- Works seamlessly with **Bloc, Cubit, Provider, or Riverpod**.
+- Great for **integration tests** where you need to mock APIs.

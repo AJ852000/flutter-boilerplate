@@ -12,44 +12,41 @@ class LoginPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Login")),
-      body: BlocProvider(
-        create: (_) => AuthBloc(),
-        child: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is AuthSuccess) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.message)));
-            }
-          },
-          builder: (context, state) {
-            if (state is AuthLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthSuccess) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(state.message)));
+          }
+        },
+        builder: (context, state) {
+          if (state is AuthLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  TextField(
-                      controller: userCtrl,
-                      decoration: const InputDecoration(labelText: "Username")),
-                  TextField(
-                      controller: passCtrl,
-                      decoration: const InputDecoration(labelText: "Password")),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      context
-                          .read<AuthBloc>()
-                          .add(LoginRequested(userCtrl.text, passCtrl.text));
-                    },
-                    child: const Text("Login"),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                TextField(
+                    controller: userCtrl,
+                    decoration: const InputDecoration(labelText: "Username")),
+                TextField(
+                    controller: passCtrl,
+                    decoration: const InputDecoration(labelText: "Password")),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<AuthBloc>()
+                        .add(LoginRequested(userCtrl.text, passCtrl.text));
+                  },
+                  child: const Text("Login"),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

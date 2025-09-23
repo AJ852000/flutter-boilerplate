@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:new_boilerplate/features/auth/view/login_page.dart';
+import 'package:new_boilerplate/features/auth/view/login_provider.dart';
 import 'core/serviceLocator.dart';
 
 void main() {
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Mini Auth App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const LoginPage(),
+      home: const LoginProvider(),
     );
   }
 }

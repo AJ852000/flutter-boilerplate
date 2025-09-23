@@ -8,7 +8,6 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets("Login uses mock repo", (tester) async {
-    // Setup test dependencies
     setupLocator(isTest: true);
 
     app.main();
@@ -19,7 +18,8 @@ void main() {
     await tester.enterText(find.byType(TextField).at(1), "1234");
 
     // Tap login
-    await tester.tap(find.text("Login"));
+    final loginButton = find.widgetWithText(ElevatedButton, 'Login');
+    await tester.tap(loginButton);
     await tester.pumpAndSettle();
 
     // Verify output

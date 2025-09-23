@@ -5,6 +5,11 @@ import 'package:new_boilerplate/features/auth/repositories/mock_auth_repository.
 final sl = GetIt.instance;
 
 void setupLocator({bool isTest = false}) {
+  // Clear previous registrations
+  if (sl.isRegistered<AuthRepository>()) {
+    sl.unregister<AuthRepository>();
+  }
+
   if (isTest) {
     // Register fake repo for testing
     sl.registerSingleton<AuthRepository>(MockAuthRepository());

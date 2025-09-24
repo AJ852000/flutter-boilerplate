@@ -1,4 +1,4 @@
-# Flutter Testing with Mockito: A Beginner's Guide 🚀
+# Flutter Testing with Mockito 🚀
 
 Welcome to this comprehensive guide on testing Flutter applications using Mockito! This tutorial will help you understand:
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:new_boilerplate/features/auth/bloc/auth_bloc.dart';
+import 'package:new_boilerplate/features/auth/repositories/auth_repository.dart';
 import 'package:new_boilerplate/features/auth/view/login_provider.dart';
 import 'core/serviceLocator.dart';
 
@@ -15,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'flutter boilerplate',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const LoginProvider(),
+      home: LoginProvider(authBloc: AuthBloc(repo: sl<AuthRepository>())),
     );
   }
 }

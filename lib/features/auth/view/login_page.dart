@@ -23,7 +23,6 @@ class LoginPage extends StatelessWidget {
           if (state is AuthLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-
           return Padding(
             padding: const EdgeInsets.all(16),
             child: Column(

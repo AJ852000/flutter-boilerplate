@@ -239,11 +239,11 @@ class LoginPage extends StatelessWidget {
 
 ```dart
 import 'package:flutter/material.dart';
-import 'service_locator.dart';
-import 'features/auth/view/login_page.dart';
+import 'package:new_boilerplate/features/auth/view/login_provider.dart';
+import 'core/serviceLocator.dart';
 
-void main() {
-  setupLocator(isTest: false); // Production repo
+void main({bool useMock = false}) {
+  setupLocator(isTest: useMock);
   runApp(const MyApp());
 }
 
@@ -253,12 +253,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mini Auth App',
+      title: 'flutter boilerplate',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const LoginPage(),
+      home: const LoginProvider(),
     );
   }
 }
+
 ```
 
 ---
@@ -268,19 +269,16 @@ class MyApp extends StatelessWidget {
 📄 [app_test.dart](../test/integration_test/app_test.dart)
 
 ```dart
-import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:myapp/main.dart' as app;
-import 'package:myapp/service_locator.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:new_boilerplate/main.dart' as app;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets("Login uses mock repo", (tester) async {
-    // Setup test dependencies
-    setupLocator(isTest: true);
-
-    app.main();
+    app.main(useMock: true);
     await tester.pumpAndSettle();
 
     // Enter username/password
@@ -288,11 +286,24 @@ void main() {
     await tester.enterText(find.byType(TextField).at(1), "1234");
 
     // Tap login
-    await tester.tap(find.text("Login"));
+    final loginButton = find.widgetWithText(ElevatedButton, 'Login');
+    await tester.tap(loginButton);
+
+    await tester.pump();
     await tester.pumpAndSettle();
 
-    // Verify output
-    expect(find.text("Welcome Ajay (mock repo)"), findsOneWidget);
+    // Verify SnackBar is shown
+    final snackBarFinder = find.byType(SnackBar);
+    expect(snackBarFinder, findsOneWidget);
+
+    // Verify text (adjust once we know the actual output)
+    expect(
+      find.descendant(
+        of: snackBarFinder,
+        matching: find.text("Welcome Ajay (mock repo)"),
+      ),
+      findsOneWidget,
+    );
   });
 }
 ```

@@ -59,7 +59,7 @@ dependencies:
 
 ## 🔹 4. Setup Service Locator
 
-📄 '../lib/core/serviceLocator.dart'
+📄 `../lib/core/serviceLocator.dart`
 
 ```dart
 import 'package:get_it/get_it.dart';
@@ -84,7 +84,7 @@ void setupLocator({bool isTest = false}) {
 
 ## 🔹 5. Repositories
 
-📄 '../lib/features/auth/repositories/auth_repository.dart'
+📄 `../lib/features/auth/repositories/auth_repository.dart`
 
 ```dart
 class AuthRepository {
@@ -96,7 +96,7 @@ class AuthRepository {
 }
 ```
 
-📄 '../lib/features/auth/repositories/mock_auth_repository.dart'
+📄 `../lib/features/auth/repositories/mock_auth_repository.dart`
 
 ```dart
 import 'auth_repository.dart';
@@ -113,7 +113,7 @@ class MockAuthRepository extends AuthRepository {
 
 ## 🔹 6. Bloc Layer
 
-📄 '../lib/features/auth/bloc/auth_event.dart'
+📄 `../lib/features/auth/bloc/auth_event.dart`
 
 ```dart
 abstract class AuthEvent {}
@@ -126,7 +126,7 @@ class LoginRequested extends AuthEvent {
 }
 ```
 
-📄 '../lib/features/auth/bloc/auth_state.dart'
+📄 `../lib/features/auth/bloc/auth_state.dart`
 
 ```dart
 abstract class AuthState {}
@@ -143,7 +143,7 @@ class AuthFailure extends AuthState {
 }
 ```
 
-📄 '../lib/features/auth/bloc/auth_bloc.dart'
+📄 `../lib/features/auth/bloc/auth_bloc.dart`
 
 ```dart
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -173,7 +173,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
 ## 🔹 7. UI Layer
 
-📄 '../lib/features/auth/view/login_page.dart'
+📄 `../lib/features/auth/view/login_page.dart`
 
 ```dart
 import 'package:flutter/material.dart';
@@ -235,7 +235,7 @@ class LoginPage extends StatelessWidget {
 
 ## 🔹 8. Main Entry
 
-📄 '../lib/main.dart`'
+📄 `../lib/main.dart`
 
 ```dart
 import 'package:flutter/material.dart';
@@ -266,7 +266,7 @@ class MyApp extends StatelessWidget {
 
 ## 🔹 9. Integration Test with Mock Repository
 
-📄 '../test/integration_test/app_test.dart'
+📄 `../test/integration_test/app_test.dart`
 
 ```dart
 import 'package:flutter/material.dart';

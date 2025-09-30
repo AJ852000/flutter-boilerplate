@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:new_boilerplate/deeplink.dart';
 import 'package:new_boilerplate/features/auth/bloc/auth_bloc.dart';
 import 'package:new_boilerplate/features/auth/repositories/auth_repository.dart';
 import 'package:new_boilerplate/features/auth/view/login_provider.dart';
 import 'core/serviceLocator.dart';
+import 'package:go_router/go_router.dart';
 
-void main({bool useMock = false}) {
-  setupLocator(isTest: useMock);
-  runApp(const MyApp());
+void main() {
+  runApp(MaterialApp.router(routerConfig: router));
+  setupLocator();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'flutter boilerplate',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: LoginProvider(authBloc: AuthBloc(repo: sl<AuthRepository>())),
-    );
-  }
-}
+/// This handles '/' and '/details'.
+final router = GoRouter(
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (_, __) => LoginProvider(
+        authBloc: AuthBloc(repo: sl<AuthRepository>()),
+      ),
+      routes: [
+        GoRoute(path: 'details', builder: (_, __) => DeppLinkTest()),
+      ],
+    ),
+  ],
+);

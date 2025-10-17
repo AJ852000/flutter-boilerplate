@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:new_boilerplate/features/auth/repositories/auth_repository.dart';
+import 'package:new_boilerplate/data/repositories/auth_repository.dart';
 
 final sl = GetIt.instance;
 
